@@ -1,0 +1,71 @@
+{
+  "name": "quill-jspdf",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "quill to pdf converter",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "umd:main": "dist/umd/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "pnpm run clean && pnpm run build:esm && pnpm run build:cjs && pnpm run build:umd && pnpm run build:types",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:umd": "rollup -c",
+    "build:types": "rollup -c rollup.config.dts.js",
+    "lint": "eslint src --ext .ts,.tsx --config .eslintrc.cjs",
+    "test": "jest --config jest.config.cjs",
+    "test:watch": "jest --watch --config jest.config.cjs",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "prepare": "pnpm run build",
+    "prepublishOnly": "pnpm test && pnpm run lint",
+    "docs": "typedoc --out docs src"
+  },
+  "keywords": [
+    "quill",
+    "jspdf",
+    "pdf",
+    "converter"
+  ],
+  "author": "fengxxc",
+  "license": "MIT",
+  "peerDependencies": {
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
+    "katex": "^0.16.21",
+    "quill": "^2.0.3",
+    "quill-table-better": "^1.1.6"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.13.14",
+    "@typescript-eslint/eslint-plugin": "^8.28.0",
+    "@typescript-eslint/parser": "^8.28.0",
+    "eslint": "^9.23.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.5",
+    "jest": "^29.7.0",
+    "prettier": "^3.5.3",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.38.0",
+    "rollup-plugin-dts": "^6.2.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "ts-jest": "^29.3.0",
+    "typescript": "^5.8.2"
+  }
+}
