@@ -11,6 +11,12 @@ const pkg = JSON.parse(
   readFileSync(new URL("./package.json", import.meta.url), "utf8"),
 );
 
+// 获取所有 peerDependencies 作为外部依赖
+const external = [
+  ...Object.keys(pkg.peerDependencies || {}),
+  ...Object.keys(pkg.dependencies || {})
+];
+
 export default [
   // UMD build (for CDN, browsers)
   {
@@ -24,6 +30,7 @@ export default [
       globals: {
         // 指定外部依赖的全局变量名
         // 例如: 'react': 'React'
+        'jspdf': 'jsPDF'  // jsPDF 在全局作用域中的变量名
       },
     },
     plugins: [
@@ -44,6 +51,7 @@ export default [
     external: [
       // 列出你不想打包进UMD的外部依赖
       // 例如: 'react', 'react-dom'
+      ...external, // 使用上面定义的外部依赖数组
     ],
   },
 ];
