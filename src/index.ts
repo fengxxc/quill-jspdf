@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf';
 import Delta, { Op } from 'quill-delta';
 import IAttributeMap from './IAttributeMap';
+import IFont from './IFont';
 
 class QuillJsPdf {
     constructor() {
@@ -15,7 +16,7 @@ class QuillJsPdf {
         return a + b;
     }
 
-    static deltaToPdf(delta: Delta, width: number): jsPDF {
+    static deltaToPdf(delta: Delta, width: number, fonts: IFont[]): jsPDF {
         // Convert Quill Delta to PDF format
         // initialize jsPDF
         var pageWidth = width || 800,
@@ -25,16 +26,15 @@ class QuillJsPdf {
             marginBottom = 2.5,
             marginLeft = 2.5,
             maxLineWidth = pageWidth - marginLeft - marginRight;
-        // ptsPerInch = 72,
-        // oneLineHeight = (fontSize * lineHeight) / ptsPerInch;
-        // oneLineHeight = fontSize * lineHeight;
         const doc: jsPDF = new jsPDF({
             unit: 'px',
             //   orientation: "landscape",
-            //   format: [4, 2],
             format: 'a4',
         }).setProperties({ title: 'This is title' }); // TODO
-        doc.setFont('helvetica');
+        fonts.forEach((font: IFont) => {
+            doc.addFont(font.url, font.id, font.fontStyle, font.fontWeight, font.encoding);
+        });
+        console.log(doc.getFontList());
         let nextCoord = {x: marginLeft, y: marginTop};
         for (let i = 0; i < delta.ops.length; i++) {
             const op = delta.ops[i];
@@ -98,12 +98,12 @@ class QuillJsPdf {
         const underline = attributes.underline || false;
         const strike = attributes.strike || false;
         const color = attributes.color || 'black';
-        const background = attributes.background || 'white';
+        const background = attributes.background || 'transparent';
         const size =
             typeof attributes.size == 'number'
                 ? attributes.size
                 : parseInt(attributes.size || '12');
-        const font = attributes.font || 'helvetica';
+        const font = attributes.font || 'Helvetica';
         // let fontStyle: string = (!bold && !italic) ? "normal" : "";
         let fontStyle: string = "";
         if (bold) {

@@ -18,9 +18,70 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div style="height: 100vh;">
     <div id="left" style="width: 49%; height: calc(100% - 2px); display: inline-block; vertical-align: top;">
       <!-- Create the editor container -->
+      <div id="toolbar">
+        <span class="ql-formats">
+          <select class="ql-font">
+            <option selected>Aref Ruqaa</option>
+            <option value="mirza">Mirza</option>
+            <option value="roboto">Roboto</option>
+            <option value="simhei">黑体</option>
+          </select>
+          <button class="ql-bold"></button>
+          <button class="ql-italic"></button>
+          <button class="ql-underline"></button>
+          <button class="ql-strike"></button>
+        </span>
+        <span class="ql-formats">
+          <select class="ql-size">
+            <!-- Note a missing, not available option since the default size is 0 -->
+            <option selected></option>
+            <option value="13px">13px</option>
+            <option value="24px">24px</option>
+            <option value="36px">36px</option>
+          </select>
+        </span>
+        <span class="ql-formats">
+          <select class="ql-color"></select>
+          <select class="ql-background"></select>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-script" value="sub"></button>
+          <button class="ql-script" value="super"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-header" value="1"></button>
+          <button class="ql-header" value="2"></button>
+          <button class="ql-blockquote"></button>
+          <button class="ql-code-block"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-list" value="ordered"></button>
+          <button class="ql-list" value="bullet"></button>
+          <button class="ql-list" value="check"></button>
+          <button class="ql-indent" value="-1"></button>
+          <button class="ql-indent" value="+1"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-direction" value="rtl"></button>
+          <select class="ql-align"></select>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-table-better"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-link"></button>
+          <button class="ql-image"></button>
+          <button class="ql-video"></button>
+          <button class="ql-formula"></button>
+        </span>
+        <span class="ql-formats">
+          <button class="ql-clean"></button>
+        </span>
+      </div>
       <div id="editor" style=" height: calc(50% - 66px);">
           <p>Hello Hello World!</p>
           <p>Some initial <strong>bold</strong> text</p>
+          <p>中文</p>
           <p>end line.</p>
       </div>
       <div id="info-box" style="height: calc(50% - 0px);">
@@ -45,10 +106,15 @@ Quill.register(
     true
 );
 
-
 var Size = Quill.import('attributors/style/size') as any;
-Size.whitelist = ['13px', '15px', '18px', '21px'];
+Size.whitelist = ['13px', '24px', '36px'];
 Quill.register(Size, true);
+
+// Add fonts to whitelist
+const Font = Quill.import('formats/font') as any;
+// We do not add Aref Ruqaa since it is the default
+Font.whitelist = ['mirza', 'roboto', 'simhei'];
+Quill.register(Font, true);
 
 const quill = new Quill('#editor', {
     theme: 'snow',
@@ -69,7 +135,8 @@ const quill = new Quill('#editor', {
             ],
             toolbarTable: true
         },
-        toolbar: [
+        toolbar: '#toolbar',
+        /* toolbar: [
             ['bold', 'italic', 'underline', 'strike'], // toggled buttons
             ['blockquote', 'code-block'],
             ['link', 'image', 'video', 'formula'],
@@ -90,7 +157,7 @@ const quill = new Quill('#editor', {
             [{ color: [] }, { background: [] }], // dropdown with defaults from theme
             [{ font: [] }],
             ['clean'] // remove formatting button
-        ],
+        ], */
         keyboard: {
             bindings: QuillTableBetter.keyboardBindings
         }
@@ -158,6 +225,7 @@ function render(doc: jsPDF) {
 function renderMain() {
     const delta = quill.getContents();
     console.log(delta);
-    const pdf: jsPDF = QuillJsPdf.deltaToPdf(delta, 800);
+    const fonts = [{ url: 'fonts/SIMHEI.TTF', id: 'simhei', fontStyle: '' }];
+    const pdf: jsPDF = QuillJsPdf.deltaToPdf(delta, 800, fonts);
     render(pdf);
 }
