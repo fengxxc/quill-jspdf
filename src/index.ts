@@ -16,21 +16,22 @@ class QuillJsPdf {
         return a + b;
     }
 
-    static deltaToPdf(delta: Delta, width: number, fonts: IFont[]): jsPDF {
+    static deltaToPdf(delta: Delta, fonts: IFont[]): jsPDF {
         // Convert Quill Delta to PDF format
         // initialize jsPDF
-        var pageWidth = width || 800,
-            lineHeight = 1.2,
-            marginTop = 20.5,
-            marginRight = 2.5,
-            marginBottom = 2.5,
-            marginLeft = 2.5,
-            maxLineWidth = pageWidth - marginLeft - marginRight;
         const doc: jsPDF = new jsPDF({
             unit: 'px',
             //   orientation: "landscape",
             format: 'a4',
         }).setProperties({ title: 'This is title' }); // TODO
+
+        var pageWidth = doc.internal.pageSize.getWidth() || 794,
+            marginTop = 10.5,
+            marginRight = 2.5,
+            marginBottom = 2.5,
+            marginLeft = 2.5,
+            maxLineWidth = pageWidth - marginLeft - marginRight;
+
         fonts.forEach((font: IFont) => {
             doc.addFont(font.url, font.id, font.fontStyle, font.fontWeight, font.encoding);
         });
@@ -38,9 +39,7 @@ class QuillJsPdf {
         let nextCoord = {x: marginLeft, y: marginTop};
         for (let i = 0; i < delta.ops.length; i++) {
             const op = delta.ops[i];
-            // delta.ops.forEach((op: Op) => {
             nextCoord = QuillJsPdf.process(doc, op, nextCoord, maxLineWidth, marginLeft);
-            // Handle other operations as needed
         }
         return doc;
     }

@@ -226,6 +226,6 @@ function renderMain() {
     const delta = quill.getContents();
     console.log(delta);
     const fonts = [{ url: 'fonts/SIMHEI.TTF', id: 'simhei', fontStyle: '' }];
-    const pdf: jsPDF = QuillJsPdf.deltaToPdf(delta, 800, fonts);
+    const pdf: jsPDF = QuillJsPdf.deltaToPdf(delta, fonts);
     render(pdf);
 }
