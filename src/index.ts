@@ -1,4 +1,4 @@
-import { jsPDF } from 'jspdf';
+import { DocumentProperties, jsPDF, jsPDFOptions } from 'jspdf';
 import Delta, { Op } from 'quill-delta';
 import IAttributeMap from './IAttributeMap';
 import IFont from './IFont';
@@ -16,14 +16,10 @@ class QuillJsPdf {
         return a + b;
     }
 
-    static deltaToPdf(delta: Delta, fonts: IFont[]): jsPDF {
+    static deltaToPdf(delta: Delta, jsPdfOptions: jsPDFOptions, docProp: DocumentProperties, fonts: IFont[]): jsPDF {
         // Convert Quill Delta to PDF format
         // initialize jsPDF
-        const doc: jsPDF = new jsPDF({
-            unit: 'px',
-            //   orientation: "landscape",
-            format: 'a4',
-        }).setProperties({ title: 'This is title' }); // TODO
+        const doc: jsPDF = new jsPDF(jsPdfOptions).setProperties(docProp);
 
         var pageWidth = doc.internal.pageSize.getWidth() || 794,
             marginTop = 10.5,

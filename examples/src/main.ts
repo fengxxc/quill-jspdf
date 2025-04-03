@@ -79,9 +79,9 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         </span>
       </div>
       <div id="editor" style=" height: calc(50% - 66px);">
-          <p>Hello Hello World!</p>
-          <p>Some initial <strong>bold</strong> text</p>
-          <p>中文</p>
+          <p>1one two three four five six seven eight nine ten 2one two three four five six seven eight nine ten 3one two three four five six seven eight nine ten</p>
+          <p class="ql-align-center">Some initial <strong>bold</strong> text</p>
+          <p class="ql-font-simhei">中文</p>
           <p>end line.</p>
       </div>
       <div id="info-box" style="height: calc(50% - 0px);">
@@ -226,6 +226,15 @@ function renderMain() {
     const delta = quill.getContents();
     console.log(delta);
     const fonts = [{ url: 'fonts/SIMHEI.TTF', id: 'simhei', fontStyle: '' }];
-    const pdf: jsPDF = QuillJsPdf.deltaToPdf(delta, fonts);
+    const pdf: jsPDF = QuillJsPdf.deltaToPdf(
+        delta,
+        {
+            unit: 'px',
+            //   orientation: "landscape",
+            format: 'a4'
+        },
+        { title: 'This is title' },
+        fonts
+    );
     render(pdf);
 }
