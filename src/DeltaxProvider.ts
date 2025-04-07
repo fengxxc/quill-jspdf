@@ -11,6 +11,7 @@ export default class DeltaxProvider {
     private _queueCache = new Array<Op>();
     private _lastHasBrOpIdx = -1;
     private _lastBrIdx = -1;
+
     public accept(op: Op): void {
         if (!("insert" in op) || op.insert == null || typeof op.insert !== 'string') {
             return;
@@ -37,6 +38,18 @@ export default class DeltaxProvider {
             this._lastBrIdx = lastBrIdx;
         }
         this._queueCache.push(op);
+    }
+
+    public setFinished() {
+        this._queueCache.push({attributes: {_end: true}} as Op);
+    }
+
+    public isFinished() {
+        if (!this.hasNext()) {
+            return false;
+        }
+        const last: Op =  this._queueCache[0];
+        return last.attributes && ("_end" in last.attributes) && last.attributes._end;
     }
 
     private hasNext(): boolean {
