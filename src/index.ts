@@ -2,6 +2,7 @@ import { DocumentProperties, jsPDF, jsPDFOptions } from 'jspdf';
 import Delta, { Op } from 'quill-delta';
 import IAttributeMap from './IAttributeMap';
 import IFont from './IFont';
+import DeltaxProvider from './DeltaxProvider';
 
 class QuillJsPdf {
     constructor() {
@@ -24,48 +25,34 @@ class QuillJsPdf {
         var pageWidth = doc.internal.pageSize.getWidth() || 794,
             marginTop = 10.5,
             marginRight = 2.5,
-            marginBottom = 2.5,
+            // marginBottom = 2.5,
             marginLeft = 2.5,
             maxLineWidth = pageWidth - marginLeft - marginRight;
 
         fonts.forEach((font: IFont) => {
             doc.addFont(font.url, font.id, font.fontStyle, font.fontWeight, font.encoding);
         });
-        console.log(doc.getFontList());
         let nextCoord = {x: marginLeft, y: marginTop};
+        const provider = new DeltaxProvider();
+
+        // TODO multithreading in future
         for (let i = 0; i < delta.ops.length; i++) {
             const op = delta.ops[i];
-            nextCoord = QuillJsPdf.process(doc, op, nextCoord, maxLineWidth, marginLeft);
-        }
-        return doc;
-    }
-
-    static process(
-        doc: jsPDF,
-        op: Op,
-        nextCoord: {x: number, y: number},
-        maxLineWidth: number,
-        xStart: number
-    ): {x: number, y: number} {
-        if (op.insert) {
-            const text = op.insert;
-            if (typeof text !== 'string') {
-                return nextCoord; // TODO Skip non-string inserts
+            if (typeof op.insert !== 'string') {
+                continue; // TODO Skip non-string inserts
             }
-            return QuillJsPdf.processInsert(
-                doc,
-                text,
-                op.attributes || {},
-                nextCoord,
-                maxLineWidth,
-                xStart
-            );
+            provider.accept(op);
         }
-        if (op.delete) {
-            return QuillJsPdf.processDelete(doc, op, nextCoord);
+        provider.setFinished();
+        while (!provider.isFinished()) {
+            const ops: Op[] = provider.consume();
+            for (let i = 0; i < ops.length; i++) {
+                const op = ops[i];
+                nextCoord = this.processInsert(doc, op.insert as string, op.attributes || {}, nextCoord, maxLineWidth, marginLeft);
+            }
         }
-        // TODO Handle other operations
-        return nextCoord;
+
+        return doc;
     }
 
     /**
@@ -90,10 +77,10 @@ class QuillJsPdf {
     ): {x: number, y: number} {
         const bold = attributes.bold || false;
         const italic = attributes.italic || false;
-        const underline = attributes.underline || false;
-        const strike = attributes.strike || false;
+        // const underline = attributes.underline || false;
+        // const strike = attributes.strike || false;
         const color = attributes.color || 'black';
-        const background = attributes.background || 'transparent';
+        // const background = attributes.background || 'transparent';
         const size =
             typeof attributes.size == 'number'
                 ? attributes.size
@@ -131,18 +118,12 @@ class QuillJsPdf {
         return this.computeNextXY(doc, coord.x, coord.y, xStart, textLines, endWidthNewLine, font, size);
     }
 
-    static processDelete(_doc: jsPDF, _op: Op, coord: {x: number, y: number}): {x: number, y: number} {
-        // Process each item in the Quill Delta
-        // TODO
-        return coord;
-    }
-
-    static computeNextXY(doc: jsPDF, x: number, y: number, xStart: number, textLines: string[], endWidthNewLine: boolean, font: string, fontSize: number): {x: number, y: number} {
+    static computeNextXY(doc: jsPDF, x: number, y: number, xStart: number, textLines: string[], endWidthNewLine: boolean, _font: string, fontSize: number): {x: number, y: number} {
         let _x = x;
         let _y = y;
         for (let i = 0; i < textLines.length; i++) {
             const textLine = textLines[i];
-            const { w, /* h */ } = doc.getTextDimensions(textLine, {/* font: font, */ fontSize: fontSize/* , maxWidth: maxLineWidth */, scaleFactor: doc.internal.scaleFactor});
+            const { w, /* h */ } = doc.getTextDimensions(textLine, {/* font: _font, */ fontSize: fontSize/* , maxWidth: maxLineWidth */, scaleFactor: doc.internal.scaleFactor});
            
             if(i == textLines.length - 1) {
                 _x += w;
