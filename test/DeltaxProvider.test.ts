@@ -132,5 +132,59 @@ describe('testAccept', () => {
             }
         }
         expect(resOpFirst[1]).toStrictEqual(resOp1Tobe);
+        const resOp2Tobe: Op = {
+            "insert": "bold",
+            "attributes": {
+                "bold": true
+            }
+        }
+
+        const resOpSecond: Op[] = it.consume();
+        expect(resOpSecond[0]).toStrictEqual(resOp2Tobe);
+
+        const resOpThird: Op[] = it.consume();
+        const resOp3Tobe: Op = {
+            "insert": " text in center line",
+        }
+        expect(resOpThird[0]).toStrictEqual(resOp3Tobe);
+
+        const resOpFourth: Op[] = it.consume();
+        const resOp4Tobe: Op = {
+            "insert": "\n",
+            "attributes": {
+                "align": "center"
+            }
+        }
+        expect(resOpFourth[0]).toStrictEqual(resOp4Tobe);
+
+        const resOpFifth: Op[] = it.consume();
+        const resOp5Tobe: Op = {
+            "insert": "\nnew line.\n",
+            "attributes": {}
+        }
+        expect(resOpFifth[0]).toStrictEqual(resOp5Tobe);
+
+        const resOp6Tobe: Op = {
+            "insert": "and second new line.",
+            "attributes": {
+                "start_align": "right",
+            }
+        }
+        expect(resOpFifth[1]).toStrictEqual(resOp6Tobe);
+
+        const resOpSixth: Op[] = it.consume();
+        const resOp7Tobe: Op = {
+            "insert": "\n",
+            "attributes": {
+                "align": "right"
+            }
+        }
+        expect(resOpSixth[0]).toStrictEqual(resOp7Tobe);
+
+        const resOpEighth: Op[] = it.consume();
+        const resOp8Tobe: Op = {
+            "insert": "\nend line.\n",
+        }
+        expect(resOpEighth[0]).toStrictEqual(resOp8Tobe);
     })
 });
