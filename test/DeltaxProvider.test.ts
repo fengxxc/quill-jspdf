@@ -2,7 +2,7 @@ import { Op } from 'quill-delta';
 import DeltaxProvider from '../src/DeltaxProvider';
 const ops = [
     {
-        insert: 'Hello World\nSome initial '
+        insert: 'Hello\n World\nSome initial '
     },
     {
         attributes: {
@@ -34,11 +34,11 @@ const ops = [
 ];
 const acceptOpsRes = [
     {
-        "insert": "Hello World\nSome initial ",
+        "insert": "Hello\n World\nSome initial ",
         "attributes": {
             "_start_align": {
                 "align": "center",
-                "index": 11
+                "index": 12
             }
         }
     },
@@ -121,7 +121,7 @@ describe('testAccept', () => {
         });
         const resOpFirst: Op[] = it.consume();
         const resOp0Tobe: Op = {
-            "insert": "Hello World\n",
+            "insert": "Hello\n World\n",
             "attributes": {}
         }
         expect(resOpFirst[0]).toStrictEqual(resOp0Tobe);
