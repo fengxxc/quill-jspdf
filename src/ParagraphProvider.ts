@@ -1,12 +1,12 @@
 import { AttributeMap, Op } from 'quill-delta';
-import DeltaxProvider, { ErrCode } from './DeltaxProvider';
+import AlignProvider, { ErrCode } from './AlignProvider';
 
 interface ParagraphAttr {
     p: number; // paragraph number, start from 0
     i: number; // "\n" char index, start from 0
 }
 
-export default class ParagraphProvider extends DeltaxProvider {
+export default class ParagraphProvider extends AlignProvider {
     private _pNum = 1;
     private _paragraphs: Map<number, Op[]> = new Map<number, Op[]>();
     private _consumePIdx: number = 0;

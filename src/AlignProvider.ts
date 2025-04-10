@@ -7,7 +7,7 @@ interface StartAlignAttr {
 
 export type ErrCode = -1 | 0;
 
-export default class DeltaxProvider {
+export default class AlignProvider {
     static BR_LEN = `\n`.length;
 
     private _queueCache = new Array<Op>();
@@ -73,7 +73,7 @@ export default class DeltaxProvider {
     }
 
     public static getBrLatter(str: string, brIndex: number) {
-        return str.slice(brIndex + DeltaxProvider.BR_LEN);
+        return str.slice(brIndex + AlignProvider.BR_LEN);
     }
 
     public consume(): Op[] {
@@ -81,8 +81,8 @@ export default class DeltaxProvider {
             return [];
         }
         const op = this.take();
-        if (DeltaxProvider.isAlignStart(op)) {
-            return DeltaxProvider.splitOpByLastBr(op);
+        if (AlignProvider.isAlignStart(op)) {
+            return AlignProvider.splitOpByLastBr(op);
         }
         return [op];
     }
@@ -97,8 +97,8 @@ export default class DeltaxProvider {
         if (typeof op.insert !== "string") {
             return [op]; // TODO
         }
-        const newText = DeltaxProvider.getBrLatter(op.insert as string, saa.index);
-        op.insert = op.insert.slice(0, saa.index + DeltaxProvider.BR_LEN);
+        const newText = AlignProvider.getBrLatter(op.insert as string, saa.index);
+        op.insert = op.insert.slice(0, saa.index + AlignProvider.BR_LEN);
         delete op.attributes!["_start_align"]
         const newOp = {
             insert: newText,

@@ -1,5 +1,5 @@
 import { Op } from 'quill-delta';
-import DeltaxProvider from '../src/DeltaxProvider';
+import AlignProvider from '../src/AlignProvider';
 const ops = [
     {
         insert: 'Hello\n World\nSome initial '
@@ -77,10 +77,10 @@ const acceptOpsRes = [
     }
 ]
 describe('testAccept', () => {
-    it('BR_LEN equals 1', () => expect(DeltaxProvider.BR_LEN).toBe(1));
+    it('BR_LEN equals 1', () => expect(AlignProvider.BR_LEN).toBe(1));
 
     it('op.startAlignAttr', () => {
-        const it = new DeltaxProvider();
+        const it = new AlignProvider();
         ops.forEach(op => {
             it.accept(op);
         });
@@ -92,7 +92,7 @@ describe('testAccept', () => {
 
     it('testGetBrLatter', () => {
         const t = "aa\nbb\ncc"
-        expect(DeltaxProvider.getBrLatter(t, t.lastIndexOf('\n'))).toBe("cc");
+        expect(AlignProvider.getBrLatter(t, t.lastIndexOf('\n'))).toBe("cc");
     });
 
     it('testSplitOpByLastBr', () => {
@@ -106,7 +106,7 @@ describe('testAccept', () => {
                 }
             }
         } as Op
-        const res = DeltaxProvider.splitOpByLastBr(op);
+        const res = AlignProvider.splitOpByLastBr(op);
         const toBeRes = [
             { insert: 'aa\nbb\n', attributes: { bold: true } },
             { insert: 'cc', attributes: { bold: true, start_align: 'right' } }
@@ -115,7 +115,7 @@ describe('testAccept', () => {
     });
 
     it('testConsume', () => {
-        const it = new DeltaxProvider();
+        const it = new AlignProvider();
         ops.forEach(op => {
             it.accept(op);
         });

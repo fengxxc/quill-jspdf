@@ -2,7 +2,7 @@ import { DocumentProperties, jsPDF, jsPDFOptions } from 'jspdf';
 import Delta, { Op } from 'quill-delta';
 import IAttributeMap from './IAttributeMap';
 import IFont from './IFont';
-import DeltaxProvider from './DeltaxProvider';
+import AlignProvider from './AlignProvider';
 
 class QuillJsPdf {
     constructor() {
@@ -33,7 +33,7 @@ class QuillJsPdf {
             doc.addFont(font.url, font.id, font.fontStyle, font.fontWeight, font.encoding);
         });
         let nextCoord = {x: marginLeft, y: marginTop};
-        const provider = new DeltaxProvider();
+        const provider = new AlignProvider();
 
         // TODO multithreading in future
         for (let i = 0; i < delta.ops.length; i++) {
