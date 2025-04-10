@@ -5,6 +5,8 @@ interface StartAlignAttr {
     index: number;
 }
 
+export type ErrCode = -1 | 0;
+
 export default class DeltaxProvider {
     static BR_LEN = `\n`.length;
 
@@ -12,9 +14,10 @@ export default class DeltaxProvider {
     private _lastHasBrOpIdx = -1;
     private _lastBrIdx = -1;
 
-    public accept(op: Op): void {
+    public accept(op: Op): ErrCode {
         if (!("insert" in op) || op.insert == null || typeof op.insert !== 'string') {
-            return;
+            console.error("Invalid insert: " + op);
+            return -1;
         }
 
         if (op.insert === '\n' && op.attributes && op.attributes?.align) {
@@ -29,7 +32,7 @@ export default class DeltaxProvider {
             this._lastHasBrOpIdx = -1;
             this._lastBrIdx = -1;
             this._queueCache.push(op);
-            return;
+            return 0;
         }
 
         const lastBrIdx = op.insert.lastIndexOf('\n');
@@ -38,6 +41,7 @@ export default class DeltaxProvider {
             this._lastBrIdx = lastBrIdx;
         }
         this._queueCache.push(op);
+        return 0;
     }
 
     public setFinished() {
@@ -49,7 +53,11 @@ export default class DeltaxProvider {
             return false;
         }
         const last: Op =  this._queueCache[0];
-        return last.attributes && ("_end" in last.attributes) && last.attributes._end;
+        return this.hasFinishedSign(last);
+    }
+
+    protected hasFinishedSign(op: Op) {
+        return op.attributes && ("_end" in op.attributes) && op.attributes._end;
     }
 
     private hasNext(): boolean {
