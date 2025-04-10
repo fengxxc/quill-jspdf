@@ -119,6 +119,7 @@ describe('testAccept', () => {
         ops.forEach(op => {
             it.accept(op);
         });
+        /* first */
         const resOpFirst: Op[] = it.consume();
         const resOp0Tobe: Op = {
             "insert": "Hello\n World\n",
@@ -132,22 +133,25 @@ describe('testAccept', () => {
             }
         }
         expect(resOpFirst[1]).toStrictEqual(resOp1Tobe);
+
+        /* second */
+        const resOpSecond: Op[] = it.consume();
         const resOp2Tobe: Op = {
             "insert": "bold",
             "attributes": {
                 "bold": true
             }
         }
-
-        const resOpSecond: Op[] = it.consume();
         expect(resOpSecond[0]).toStrictEqual(resOp2Tobe);
 
+        /* third */
         const resOpThird: Op[] = it.consume();
         const resOp3Tobe: Op = {
             "insert": " text in center line",
         }
         expect(resOpThird[0]).toStrictEqual(resOp3Tobe);
 
+        /* fourth */
         const resOpFourth: Op[] = it.consume();
         const resOp4Tobe: Op = {
             "insert": "\n",
@@ -157,6 +161,7 @@ describe('testAccept', () => {
         }
         expect(resOpFourth[0]).toStrictEqual(resOp4Tobe);
 
+        /* fifth */
         const resOpFifth: Op[] = it.consume();
         const resOp5Tobe: Op = {
             "insert": "\nnew line.\n",
@@ -172,6 +177,7 @@ describe('testAccept', () => {
         }
         expect(resOpFifth[1]).toStrictEqual(resOp6Tobe);
 
+        /* sixth */
         const resOpSixth: Op[] = it.consume();
         const resOp7Tobe: Op = {
             "insert": "\n",
@@ -181,6 +187,7 @@ describe('testAccept', () => {
         }
         expect(resOpSixth[0]).toStrictEqual(resOp7Tobe);
 
+        /* eighth */
         const resOpEighth: Op[] = it.consume();
         const resOp8Tobe: Op = {
             "insert": "\nend line.\n",
