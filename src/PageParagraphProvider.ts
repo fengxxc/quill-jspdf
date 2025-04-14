@@ -58,7 +58,7 @@ export default class PageParagraphProvider extends ParagraphProvider {
             if (textLines.length > 1) {
                 const newSplits: Op[] = this.splitOp(op, textLines, size);
                 pSplits.splice(i, 1, ...newSplits);
-                i += newSplits.length - 1;
+                i += newSplits.length;
             } else {
                 const {w, } = this._doc.getTextDimensions(insert, {fontSize: size, scaleFactor: this._doc.internal.scaleFactor});
                 if (op.attributes === undefined) {
