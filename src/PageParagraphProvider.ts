@@ -4,6 +4,11 @@ import { ErrCode } from './AlignProvider';
 import jsPDF from 'jspdf';
 import IAttributeMap from './IAttributeMap';
 
+/* interface ParagraphLine {
+    ops: Op[];
+    width: number;
+} */
+
 export default class PageParagraphProvider extends ParagraphProvider {
     private _doc: jsPDF;
     private _width: number = 0;
@@ -49,26 +54,31 @@ export default class PageParagraphProvider extends ParagraphProvider {
                 .setFont(font, fontStyle)
                 .setFontSize(size)
                 .splitTextToSize(text, this._width);
-            const newSplits: Op[] = this.splitOp(op, textLines);
             // append to pSplits
-            if (newSplits.length > 1) {
+            if (textLines.length > 1) {
+                const newSplits: Op[] = this.splitOp(op, textLines, size);
                 pSplits.splice(i, 1, ...newSplits);
-                for (let j = 0; j < pSplits.length; j++) {
-                    pSplits[j].insert += "\n";
-                }
                 i += newSplits.length - 1;
+            } else {
+                const {w, } = this._doc.getTextDimensions(insert, {fontSize: size, scaleFactor: this._doc.internal.scaleFactor});
+                if (op.attributes === undefined) {
+                    op.attributes = {};
+                }
+                op.attributes["_w"] = w;
+                // op.attributes["_h"] = h;
             }
         }
         return pSplits;
     }
 
-    private splitOp(op: Op, textLines: string[]): Op[] {
+    private splitOp(op: Op, textLines: string[], size: number): Op[] {
         const newOps: Op[] = [];
         for (let i = 0; i < textLines.length; i++) {
-            const line = textLines[i];
+            const line: string = textLines[i] += "\n";
+            const {w, } = this._doc.getTextDimensions(line, {fontSize: size, scaleFactor: this._doc.internal.scaleFactor});
             const newOp: Op = {
                 insert: line,
-                attributes: op.attributes
+                attributes: { ...op.attributes, "_w": w }
             };
             newOps.push(newOp);
         }

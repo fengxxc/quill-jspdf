@@ -46,11 +46,15 @@ describe('PageParagraphProvider', () => {
         expect(resOpFirst).toStrictEqual([
             {
                 "insert": "1one two three four five six seven eight nine ten 2one two three four five six seven eight nine ten 3one two\n",
-                "attributes": {}
+                "attributes": {
+                    "_w": 425.15999999999985,
+                }
             },
             {
                 "insert": "three four five six seven eight nine ten\n",
-                "attributes": {}
+                "attributes": {
+                    "_w": 155.52000000000007,
+                }
             }
         ]);
 
@@ -64,22 +68,28 @@ describe('PageParagraphProvider', () => {
             {
                 "insert": "Some initial ",
                 "attributes": {
-                    "start_align": "center"
+                    "start_align": "center",
+                    "_w": 48.690000000000005,
                 }
             },
             {
+                "insert": "bold",
                 "attributes": {
-                    "bold": true
+                    "bold": true,
+                    "_w": 18.990000000000002,
                 },
-                "insert": "bold"
             },
             {
-                "insert": " text"
+                "insert": " text",
+                "attributes": {
+                    "_w": 17.01,
+                },
             },
             {
                 "insert": "\n",
                 "attributes": {
-                    "align": "center"
+                    "align": "center",
+                    "_w": 4.7700000000000005,
                 }
             }
         ]);
@@ -90,7 +100,9 @@ describe('PageParagraphProvider', () => {
         expect(resOpThird).toStrictEqual([
             {
                 "insert": "\n",
-                "attributes": {}
+                "attributes": {
+                    "_w": 4.7700000000000005,
+                }
             }
         ]);
 
@@ -100,7 +112,9 @@ describe('PageParagraphProvider', () => {
         expect(resOpFourth).toStrictEqual([
             {
                 "insert": "end line.\n",
-                "attributes": {}
+                "attributes": {
+                    "_w": 38.52000000000001,
+                }
             }
         ]);
     });
