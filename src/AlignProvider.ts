@@ -11,7 +11,7 @@ export default class AlignProvider {
     static BR_LEN = `\n`.length;
 
     private _queueCache = new Array<Op>();
-    private _lastHasBrOpIdx = -1;
+    private _lastHasBrOpIdx = 0;
     private _lastBrIdx = -1;
 
     public accept(op: Op): ErrCode {
@@ -29,14 +29,14 @@ export default class AlignProvider {
                 this._queueCache[this._lastHasBrOpIdx].attributes = {};
             }
             this._queueCache[this._lastHasBrOpIdx].attributes!["_start_align"] = saa;
-            this._lastHasBrOpIdx = -1;
             this._lastBrIdx = -1;
             this._queueCache.push(op);
+            this._lastHasBrOpIdx = this._queueCache.length;
             return 0;
         }
 
         const lastBrIdx = op.insert.lastIndexOf('\n');
-        if (!op.insert.endsWith('\n') && -1 < lastBrIdx) {
+        if (-1 < lastBrIdx) {
             this._lastHasBrOpIdx = this._queueCache.length;
             this._lastBrIdx = lastBrIdx;
         }
