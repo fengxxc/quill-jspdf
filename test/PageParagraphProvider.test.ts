@@ -47,12 +47,14 @@ describe('PageParagraphProvider', () => {
             {
                 "insert": "1one two three four five six seven eight nine ten 2one two three four five six seven eight nine ten 3one two\n",
                 "attributes": {
+                    "_lw": 425.15999999999985,
                     "_w": 425.15999999999985,
                 }
             },
             {
                 "insert": "three four five six seven eight nine ten\n",
                 "attributes": {
+                    "_lw": 155.52000000000007,
                     "_w": 155.52000000000007,
                 }
             }
@@ -69,6 +71,7 @@ describe('PageParagraphProvider', () => {
                 "insert": "Some initial ",
                 "attributes": {
                     "start_align": "center",
+                    "_lw": 89.46000000000001,
                     "_w": 48.690000000000005,
                 }
             },
@@ -76,12 +79,14 @@ describe('PageParagraphProvider', () => {
                 "insert": "bold",
                 "attributes": {
                     "bold": true,
+                    "_lw": 89.46000000000001,
                     "_w": 18.990000000000002,
                 },
             },
             {
                 "insert": " text",
                 "attributes": {
+                    "_lw": 89.46000000000001,
                     "_w": 17.01,
                 },
             },
@@ -89,6 +94,7 @@ describe('PageParagraphProvider', () => {
                 "insert": "\n",
                 "attributes": {
                     "align": "center",
+                    "_lw": 89.46000000000001,
                     "_w": 4.7700000000000005,
                 }
             }
@@ -101,6 +107,7 @@ describe('PageParagraphProvider', () => {
             {
                 "insert": "\n",
                 "attributes": {
+                    "_lw": 4.7700000000000005,
                     "_w": 4.7700000000000005,
                 }
             }
@@ -113,6 +120,7 @@ describe('PageParagraphProvider', () => {
             {
                 "insert": "end line.\n",
                 "attributes": {
+                    "_lw": 38.52000000000001,
                     "_w": 38.52000000000001,
                 }
             }

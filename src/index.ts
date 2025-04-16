@@ -44,11 +44,30 @@ class QuillJsPdf {
             provider.accept(op);
         }
         provider.setFinished();
+        let align: string | undefined = undefined;
         while (!provider.isFinished()) {
             const ops: Op[] = provider.consume();
             for (let i = 0; i < ops.length; i++) {
                 const op = ops[i];
-                nextCoord = this.processInsert(doc, op.insert as string, op.attributes || {}, nextCoord, maxLineWidth, marginLeft);
+                const attr: IAttributeMap = op.attributes || {};
+
+                let xStart = marginLeft;
+                if (op.attributes && "start_align" in op.attributes) {
+                    align = op.attributes.start_align as string;
+                    if (align == "center") {
+                        const lw = attr._lw || 0;
+                        nextCoord.x += (maxLineWidth - lw) / 2;
+                        xStart = nextCoord.x;
+                    }
+                }
+
+                nextCoord = this.processInsert(doc, op.insert as string, attr, nextCoord, xStart);
+
+                if (op.attributes && "align" in op.attributes) {
+                    align = undefined;
+                    xStart = marginLeft;
+                    nextCoord.x = xStart;
+                }
             }
         }
 
@@ -61,9 +80,7 @@ class QuillJsPdf {
      * @param text 
      * @param attributes 
      * @param coord 
-     * @param maxLineWidth 
      * @param xStart 
-     * @param endWidthNewLine 
      * @returns 下一个的坐标
      */
     static processInsert(
@@ -71,9 +88,7 @@ class QuillJsPdf {
         text: string,
         attributes: IAttributeMap,
         coord: {x: number, y: number},
-        maxLineWidth: number,
         xStart: number,
-        endWidthNewLine: boolean = false
     ): {x: number, y: number} {
         const bold = attributes.bold || false;
         const italic = attributes.italic || false;
@@ -94,50 +109,28 @@ class QuillJsPdf {
         if (italic) {
             fontStyle += "italic";
         }
-        var textLines: string[] = doc
-            .setFont(font, fontStyle)
+
+        doc.setFont(font, fontStyle)
             .setFontSize(size)
             .setTextColor(color)
-            .splitTextToSize(text, maxLineWidth);
-        console.log(textLines, fontStyle)
-        if (textLines.length > 1 && coord.x != xStart) {
-            /**
-             * 如果是多行并且是接上一个的结尾，则按第一个末尾的"\n"分割，分两批，第一批接上一个，第二批另起一行
-             * 例如
-             * aaaaaaaa
-             * aaaabbbb
-             * bbbbbbbb
-             * a... 是上一个，b... 是本个
-             */
-            const firstLine = textLines[0];
-            const firstCoord = this.processInsert(doc, firstLine, attributes, coord, maxLineWidth, xStart, true);
-            return this.processInsert(doc, text.replace(firstLine + '\n', ''), attributes, firstCoord, maxLineWidth, xStart, false);
-        }
-        doc.text(textLines, coord.x, coord.y, { baseline: "alphabetic"/* , align: "center" */});
-        // doc.rect(coord.x, coord.y, 1, 1,); // Debug: view baseline point
-        return this.computeNextXY(doc, coord.x, coord.y, xStart, textLines, endWidthNewLine, font, size);
+
+        doc.text(text, coord.x, coord.y, { baseline: "alphabetic"/* , align: "center" */});
+        
+        return this.computeNextXY(doc, coord.x, coord.y, xStart, text, attributes);
     }
 
-    static computeNextXY(doc: jsPDF, x: number, y: number, xStart: number, textLines: string[], endWidthNewLine: boolean, _font: string, fontSize: number): {x: number, y: number} {
+    static computeNextXY(doc: jsPDF, x: number, y: number, xStart: number, text: string, attributes: IAttributeMap): {x: number, y: number} {
         let _x = x;
         let _y = y;
-        for (let i = 0; i < textLines.length; i++) {
-            const textLine = textLines[i];
-            const { w, /* h */ } = doc.getTextDimensions(textLine, {/* font: _font, */ fontSize: fontSize/* , maxWidth: maxLineWidth */, scaleFactor: doc.internal.scaleFactor});
-           
-            if(i == textLines.length - 1) {
-                _x += w;
-                if (endWidthNewLine) {
-                    _x = xStart;
-                    _y += doc.getLineHeight() / doc.internal.scaleFactor
-                }
-            } else {
-                // _y += h;
-                _y += doc.getLineHeight() / doc.internal.scaleFactor
-            }
+        if (text.endsWith("\n")) {
+            _x = xStart;
+            _y += doc.getLineHeight() / doc.internal.scaleFactor;
+        } else {
+            _x += attributes._w || 0;
         }
         return {x: _x, y: _y};
     }
+
 }
 
 export default QuillJsPdf;
