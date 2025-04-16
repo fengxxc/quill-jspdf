@@ -1,3 +1,4 @@
+import { Op } from 'quill-delta';
 import ParagraphProvider from '../src/ParagraphProvider';
 const ops = [
     {
@@ -119,6 +120,81 @@ const acceptOpsRes = [
         }
     }
 ]
+const consumeOpsRes = [
+    [
+        {
+            "insert": "Hello\n",
+            "attributes": {}
+        }
+    ],
+    [
+        {
+            "insert": " World\n",
+            "attributes": {}
+        }
+    ],
+    [
+        {
+            "insert": "Some initial ",
+            "attributes": {
+                "start_align": "center"
+            }
+        },
+        {
+            "insert": "bold",
+            "attributes": {
+                "bold": true
+            },
+        },
+        {
+            "insert": " text in center line"
+        },
+        {
+            "insert": "\n",
+            "attributes": {
+                "align": "center"
+            }
+        }
+    ],
+    [
+        {
+            "insert": "\n",
+            "attributes": {}
+        }
+    ],
+    [
+        {
+            "insert": "new line.\n",
+            "attributes": {}
+        }
+    ],
+    [
+        {
+            "insert": "and second new line.",
+            "attributes": {
+                "start_align": "right"
+            }
+        },
+        {
+            "insert": "\n",
+            "attributes": {
+                "align": "right"
+            }
+        }
+    ],
+    [
+        {
+            "insert": "\n",
+            "attributes": {}
+        }
+    ],
+    [
+        {
+            "insert": "end line.\n",
+            "attributes": {}
+        }
+    ]
+];
 
 describe('testAccept', () => {
     it('test accept', () => {
@@ -140,111 +216,16 @@ describe('testAccept', () => {
         });
         provider.setFinished();
 
-        /* first */
-        const resOpFirst = provider.consume();
-        // console.log(JSON.stringify(resOpFirst, null, 4));
-        expect(resOpFirst).toStrictEqual([
-            {
-                "insert": "Hello\n",
-                "attributes": {}
+        const opsRes: Array<Op[]> = [];
+        while (!provider.isFinished()) {
+            const ops: Op[] = provider.consume();
+            if (ops.length === 0) {
+                continue;
             }
-        ]);
+            opsRes.push(ops);
+        }
+        // console.log(JSON.stringify(opsRes, null, 4));
+        expect(opsRes).toStrictEqual(consumeOpsRes);
 
-        /* second */
-        const resOpSecond = provider.consume();
-        // console.log(JSON.stringify(resOpSecond, null, 4));
-        expect(resOpSecond).toStrictEqual([
-            {
-                "insert": " World\n",
-                "attributes": {}
-            }
-        ]);
-
-        /* third */
-        provider.consume();
-        provider.consume();
-        const resOpThird = provider.consume();
-        // console.log(JSON.stringify(resOpThird, null, 4));
-        expect(resOpThird).toStrictEqual([
-            {
-                "insert": "Some initial ",
-                "attributes": {
-                    "start_align": "center"
-                }
-            },
-            {
-                "insert": "bold",
-                "attributes": {
-                    "bold": true
-                },
-            },
-            {
-                "insert": " text in center line"
-            },
-            {
-                "insert": "\n",
-                "attributes": {
-                    "align": "center"
-                }
-            }
-        ]);
-
-        /* fourth */
-        const resOpFourth = provider.consume();
-        // console.log(JSON.stringify(resOpFourth, null, 4));
-        expect(resOpFourth).toStrictEqual([
-            {
-                "insert": "\n",
-                "attributes": {}
-            }
-        ]);
-
-        /* fifth */
-        const resOpFifth = provider.consume();
-        // console.log(JSON.stringify(resOpFifth, null, 4));
-        expect(resOpFifth).toStrictEqual([
-            {
-                "insert": "new line.\n",
-                "attributes": {}
-            }
-        ]);
-
-        /* sixth */
-        const resOpSixth = provider.consume();
-        // console.log(JSON.stringify(resOpSixth, null, 4));
-        expect(resOpSixth).toStrictEqual([
-            {
-                "insert": "and second new line.",
-                "attributes": {
-                    "start_align": "right"
-                }
-            },
-            {
-                "insert": "\n",
-                "attributes": {
-                    "align": "right"
-                }
-            }
-        ]);
-
-        /* seventh */
-        const resOpSeventh = provider.consume();
-        // console.log(JSON.stringify(resOpSeventh, null, 4));
-        expect(resOpSeventh).toStrictEqual([
-            {
-                "insert": "\n",
-                "attributes": {}
-            }
-        ]);
-
-        /* eighth */
-        const resOpEighth = provider.consume();
-        // console.log(JSON.stringify(resOpEighth, null, 4));
-        expect(resOpEighth).toStrictEqual([
-            {
-                "insert": "end line.\n",
-                "attributes": {}
-            }
-        ]);
     });
 });
