@@ -39,6 +39,16 @@ export default class ParagraphProvider extends AlignProvider {
         return 0;
     }
 
+    public isFinished() {
+        if (this._paragraphs.size == 1) {
+            const maxKey = Math.max(...this._paragraphs.keys());
+            const ops: Op[] = this._paragraphs.get(maxKey)!;
+            const isEndFinishedSign = super.hasFinishedSign(ops[0]);
+            return isEndFinishedSign;
+        }
+        return false;
+    }
+
     public consume(): Op[] {
         const alignSplits: Op[] = super.consume();
         if (alignSplits.length == 2 && alignSplits[1].attributes && "_ps" in alignSplits[1].attributes) {
