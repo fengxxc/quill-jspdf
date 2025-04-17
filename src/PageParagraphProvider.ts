@@ -95,6 +95,9 @@ export default class PageParagraphProvider extends ParagraphProvider {
             }
             const {w, } = this._doc.getTextDimensions(line, {fontSize: size, scaleFactor: this._doc.internal.scaleFactor});
             const newAttr: IAttributeMap = { ...op.attributes, "_w": w };
+            if ("start_align" in newAttr && i > 0) {
+                delete newAttr["start_align"];
+            }
             if (isBrLine) {
                 newAttr["_lw"] = w;
             }
