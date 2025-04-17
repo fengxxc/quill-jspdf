@@ -54,11 +54,14 @@ class QuillJsPdf {
                 let xStart = marginLeft;
                 if (op.attributes && "start_align" in op.attributes) {
                     align = op.attributes.start_align as "left" | "center" | "right" | "justify" | undefined;
+                }
+
+                if (align !== undefined && (i == 0 || (ops[i - 1].insert as string).endsWith("\n"))) {
                     const lw = attr._lw || 0;
                     if (align == "center") {
-                        nextCoord.x += (maxLineWidth - lw) / 2;
+                        nextCoord.x = marginLeft + (maxLineWidth - lw) / 2;
                     } else if (align == "right") {
-                        nextCoord.x += maxLineWidth - lw;
+                        nextCoord.x = marginLeft + maxLineWidth - lw;
                     }
                     xStart = nextCoord.x;
                 }
