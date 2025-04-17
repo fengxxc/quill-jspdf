@@ -44,7 +44,7 @@ class QuillJsPdf {
             provider.accept(op);
         }
         provider.setFinished();
-        let align: string | undefined = undefined;
+        let align: "left" | "center" | "right" | "justify" | undefined = undefined;
         while (!provider.isFinished()) {
             const ops: Op[] = provider.consume();
             for (let i = 0; i < ops.length; i++) {
@@ -53,12 +53,14 @@ class QuillJsPdf {
 
                 let xStart = marginLeft;
                 if (op.attributes && "start_align" in op.attributes) {
-                    align = op.attributes.start_align as string;
+                    align = op.attributes.start_align as "left" | "center" | "right" | "justify" | undefined;
+                    const lw = attr._lw || 0;
                     if (align == "center") {
-                        const lw = attr._lw || 0;
                         nextCoord.x += (maxLineWidth - lw) / 2;
-                        xStart = nextCoord.x;
+                    } else if (align == "right") {
+                        nextCoord.x += maxLineWidth - lw;
                     }
+                    xStart = nextCoord.x;
                 }
 
                 nextCoord = this.processInsert(doc, op.insert as string, attr, nextCoord, xStart);
@@ -114,8 +116,10 @@ class QuillJsPdf {
             .setFontSize(size)
             .setTextColor(color)
 
-        doc.text(text, coord.x, coord.y, { baseline: "alphabetic"/* , align: "center" */});
+        doc.text(text, coord.x, coord.y, { baseline: "alphabetic"/* , align: align */});
         
+        // doc.rect(coord.x, coord.y - doc.getLineHeight() / doc.internal.scaleFactor, attributes._w || 0, doc.getLineHeight() / doc.internal.scaleFactor); // Debug: view baseline point
+        // doc.rect(xStart, coord.y - doc.getLineHeight() / doc.internal.scaleFactor, attributes._lw || 0, doc.getLineHeight() / doc.internal.scaleFactor); // Debug: view baseline point
         return this.computeNextXY(doc, coord.x, coord.y, xStart, text, attributes);
     }
 
