@@ -14,6 +14,7 @@ export default interface IAttributeMap extends AttributeMap {
     start_align?: string; // start align, for example: "left", "center", "right"
     align?: string; // align, for example: "left", "center", "right"
     _w?: number; // width of the text in the current line
+    _lw?: number; // width of the full text in the current line
 
     // align?: string;
     // lineHeight?: number;
