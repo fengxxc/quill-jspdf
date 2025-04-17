@@ -93,9 +93,14 @@ export default class AlignProvider {
      * @returns 
      */
     public static splitOpByLastBr(op: Op): Op[] {
-        const saa = op.attributes!["_start_align"] as StartAlignAttr;
         if (typeof op.insert !== "string") {
             return [op]; // TODO
+        }
+        const saa = op.attributes!["_start_align"] as StartAlignAttr;
+        if (saa.index < 0) {
+            op.attributes!["start_align"] = saa.align;
+            delete op.attributes!["_start_align"]
+            return [op];
         }
         const newText = AlignProvider.getBrLatter(op.insert as string, saa.index);
         op.insert = op.insert.slice(0, saa.index + AlignProvider.BR_LEN);

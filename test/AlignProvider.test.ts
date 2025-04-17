@@ -194,4 +194,46 @@ describe('testAccept', () => {
         }
         expect(resOpEighth[0]).toStrictEqual(resOp8Tobe);
     })
+
+    it('test first line align right', () => {
+
+        const _ops = [
+            {
+                insert: 'Hello'
+            },
+            {
+                attributes: {
+                    align: 'right'
+                },
+                insert: '\n'
+            },
+        ];
+
+        const it = new AlignProvider();
+        _ops.forEach(op => {
+            it.accept(op);
+        });
+
+        /* first */
+        const resOpFirst: Op[] = it.consume();
+        // console.log(JSON.stringify(resOpFirst, null, 4));
+        const resOp0Tobe: Op = {
+            "insert": "Hello",
+            "attributes": {
+                "start_align": "right",
+            }
+        }
+        expect(resOpFirst[0]).toStrictEqual(resOp0Tobe);
+
+        /* second */
+        const resOpSecond: Op[] = it.consume();
+        // console.log(JSON.stringify(resOpSecond, null, 4));
+        const resOp1Tobe: Op = {
+            "insert": "\n",
+            "attributes": {
+                "align": "right",
+            }
+        }
+        expect(resOpSecond[0]).toStrictEqual(resOp1Tobe);
+    });
 });
