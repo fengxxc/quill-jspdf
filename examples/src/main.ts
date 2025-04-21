@@ -7,6 +7,7 @@ import 'quill/dist/quill.snow.css';
 import 'quill-table-better/dist/quill-table-better.css';
 import { jsPDF } from 'jspdf';
 import QuillJsPdf from '../../src/index';
+import IFont from '../../src/IFont';
 
 (window as any).katex = katex;
 
@@ -25,6 +26,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
             <option value="mirza">Mirza</option>
             <option value="roboto">Roboto</option>
             <option value="simhei">黑体</option>
+            <option value="NotoSansSC">NotoSansSC</option>
           </select>
           <button class="ql-bold"></button>
           <button class="ql-italic"></button>
@@ -79,9 +81,10 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
         </span>
       </div>
       <div id="editor" style=" height: calc(50% - 66px);">
-          <p>1one two three four five six seven eight nine ten 2one two three four five six seven eight nine ten 3one two three four five six seven eight nine ten</p>
+          <p class="ql-align-right">1one two three four five six seven eight nine ten 2one two three four five six seven eight nine ten 3one two three four five six seven eight nine ten</p>
           <p class="ql-align-center">Some initial <strong>bold</strong> text</p>
           <p class="ql-font-simhei">中文</p>
+          <p class="ql-font-NotoSansSC">日本のドラマ</p>
           <p>end line.</p>
       </div>
       <div id="info-box" style="height: calc(50% - 0px);">
@@ -113,7 +116,7 @@ Quill.register(Size, true);
 // Add fonts to whitelist
 const Font = Quill.import('formats/font') as any;
 // We do not add Aref Ruqaa since it is the default
-Font.whitelist = ['mirza', 'roboto', 'simhei'];
+Font.whitelist = ['mirza', 'roboto', 'simhei', 'NotoSansSC'];
 Quill.register(Font, true);
 
 const quill = new Quill('#editor', {
@@ -224,8 +227,12 @@ function render(doc: jsPDF) {
 
 function renderMain() {
     const delta = quill.getContents();
-    console.log(delta);
-    const fonts = [{ url: 'fonts/SIMHEI.TTF', id: 'simhei', fontStyle: '' }];
+    const fonts: IFont[] = [
+      { url: 'fonts/SIMHEI.TTF', id: 'simhei', fontStyle: '' }, 
+      // { url: 'fonts/SIMHEI.TTF', id: 'simhei', fontStyle: 'bold' },
+      { url: 'fonts/NotoSansSC-Regular.ttf', id: 'NotoSansSC', fontStyle: '' }, 
+      { url: 'fonts/NotoSansSC-Bold.ttf', id: 'NotoSansSC', fontStyle: 'bold' }, 
+    ];
     const pdf: jsPDF = QuillJsPdf.deltaToPdf(
         delta,
         {
