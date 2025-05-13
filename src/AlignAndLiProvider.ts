@@ -7,7 +7,7 @@ interface StartAlignAttr {
 
 export type ErrCode = -1 | 0;
 
-export default class AlignProvider {
+export default class AlignAndLiProvider {
     static BR_LEN = `\n`.length;
 
     private _queueCache = new Array<Op>();
@@ -20,15 +20,20 @@ export default class AlignProvider {
             return -1;
         }
 
-        if (op.insert === '\n' && op.attributes && op.attributes?.align) {
-            const saa = {
-                align: op.attributes.align,
-                index: this._lastBrIdx
-            } as StartAlignAttr;
+        if (op.insert === '\n' && op.attributes) {
             if (this._queueCache[this._lastHasBrOpIdx].attributes === undefined) {
                 this._queueCache[this._lastHasBrOpIdx].attributes = {};
             }
-            this._queueCache[this._lastHasBrOpIdx].attributes!["_start_align"] = saa;
+            if (op.attributes?.align) {
+                this._queueCache[this._lastHasBrOpIdx].attributes!["_start_align"] = {
+                    align: op.attributes.align,
+                    index: this._lastBrIdx
+                } as StartAlignAttr;
+            }
+            if (op.attributes?.list) {
+                this._queueCache[this._lastHasBrOpIdx].attributes!["start_list"] = op.attributes.list;
+            }
+            // TODO indent
             this._lastBrIdx = -1;
             this._queueCache.push(op);
             this._lastHasBrOpIdx = this._queueCache.length;
@@ -73,7 +78,7 @@ export default class AlignProvider {
     }
 
     public static getBrLatter(str: string, brIndex: number) {
-        return str.slice(brIndex + AlignProvider.BR_LEN);
+        return str.slice(brIndex + AlignAndLiProvider.BR_LEN);
     }
 
     public consume(): Op[] {
@@ -81,8 +86,8 @@ export default class AlignProvider {
             return [];
         }
         const op = this.take();
-        if (AlignProvider.isAlignStart(op)) {
-            return AlignProvider.splitOpByLastBr(op);
+        if (AlignAndLiProvider.isAlignStart(op)) {
+            return AlignAndLiProvider.splitOpByLastBr(op);
         }
         return [op];
     }
@@ -102,8 +107,8 @@ export default class AlignProvider {
             delete op.attributes!["_start_align"]
             return [op];
         }
-        const newText = AlignProvider.getBrLatter(op.insert as string, saa.index);
-        op.insert = op.insert.slice(0, saa.index + AlignProvider.BR_LEN);
+        const newText = AlignAndLiProvider.getBrLatter(op.insert as string, saa.index);
+        op.insert = op.insert.slice(0, saa.index + AlignAndLiProvider.BR_LEN);
         delete op.attributes!["_start_align"]
         const newOp = {
             insert: newText,

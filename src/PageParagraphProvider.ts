@@ -1,6 +1,6 @@
 import { Op } from 'quill-delta';
 import ParagraphProvider from './ParagraphProvider';
-import { ErrCode } from './AlignProvider';
+import { ErrCode } from './AlignAndLiProvider';
 import jsPDF from 'jspdf';
 import IAttributeMap from './IAttributeMap';
 
