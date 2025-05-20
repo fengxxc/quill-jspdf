@@ -24,7 +24,6 @@ export default class PageParagraphProvider extends ParagraphProvider {
 
     public consume(): Op[] {
         let lastBrIdx = -1;
-        let lineWidth = 0;
         const pSplits: Op[] = super.consume();
         for (let i = 0; i < pSplits.length; i++) {
             const op = pSplits[i];
@@ -47,6 +46,7 @@ export default class PageParagraphProvider extends ParagraphProvider {
             }
             const endWithBr: boolean = insert.endsWith('\n');
             const text = endWithBr ? insert.slice(0, -1) : insert;
+            // last unfinished text for indent
             const textIndent = PageParagraphProvider.getLastWidth(pSplits, lastBrIdx + 1, i);
             const textLines: string[] = this._doc
                 .setFont(font, fontStyle)
@@ -58,12 +58,9 @@ export default class PageParagraphProvider extends ParagraphProvider {
                 pSplits.splice(i, 1, ...newSplits);
                 i += newSplits.length - 1;
                 if (!endWithBr) {
-                    const lastOp = newSplits[newSplits.length - 1];
                     lastBrIdx = i - 1;
-                    lineWidth = lastOp.attributes!._w as number || 0;
                 } else {
                     lastBrIdx = i;
-                    lineWidth = 0;
                 }
             } else {
                 const {w, } = this._doc.getTextDimensions(insert, {fontSize: size, scaleFactor: this._doc.internal.scaleFactor});
@@ -71,18 +68,32 @@ export default class PageParagraphProvider extends ParagraphProvider {
                     op.attributes = {};
                 }
                 op.attributes["_w"] = w;
-                lineWidth += w;
             }
         }
         // 把前面的换行之后的全都 set lineWidth 
-        for (let i = lastBrIdx + 1; i < pSplits.length; i++) {
+        PageParagraphProvider.putAllLineWidth(pSplits);
+        return pSplits;
+    }
+
+    private static putAllLineWidth(pSplits: Op[]): void {
+        let startIdx: number = 0;
+        let lineWidth: number = 0;
+        for (let i = 0; i < pSplits.length; i++) {
             const op = pSplits[i];
             if (op.attributes === undefined) {
                 op.attributes = {};
             }
-            op.attributes["_lw"] = lineWidth;
+            if ("_w" in op.attributes) {
+                lineWidth += op.attributes["_w"] as number;
+            }
+            if ("_lw" in op.attributes || i == pSplits.length - 1) {
+                for (let j = startIdx; j <= i; j++) {
+                    pSplits[j].attributes!["_lw"] = lineWidth;
+                }
+                startIdx = i + 1;
+                lineWidth = 0;
+            }
         }
-        return pSplits;
     }
 
     private splitOp(op: Op, textLines: string[], size: number, endWithBr: boolean): Op[] {
@@ -99,7 +110,7 @@ export default class PageParagraphProvider extends ParagraphProvider {
                 delete newAttr["start_align"];
             }
             if (isBrLine) {
-                newAttr["_lw"] = w;
+                newAttr["_lw"] = -1;
             }
             const newOp: Op = {
                 insert: line,
