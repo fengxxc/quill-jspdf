@@ -73,6 +73,14 @@ class QuillJsPdf {
                     xStart = marginLeft;
                     nextCoord.x = xStart;
                 }
+
+                // remove _lw and _w
+                if (op.attributes && "_lw" in op.attributes) {
+                    delete op.attributes._lw;
+                }
+                if (op.attributes && "_w" in op.attributes) {
+                    delete op.attributes._w;
+                }
             }
         }
 
