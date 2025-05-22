@@ -20,7 +20,7 @@ export default class AlignAndLiProvider {
             return -1;
         }
 
-        if (op.insert === '\n' && op.attributes) {
+        if (op.insert.match(/\n+/) && op.attributes) {
             if (this._queueCache[this._lastHasBrOpIdx].attributes === undefined) {
                 this._queueCache[this._lastHasBrOpIdx].attributes = {};
             }

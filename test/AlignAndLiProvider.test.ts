@@ -301,4 +301,75 @@ describe('testAccept', () => {
         }
         expect(resOpSecond[0]).toStrictEqual(resOp1Tobe);
     });
+
+    it('test mutiple Break', () => {
+        const provider = new AlignAndLiProvider();
+        [
+            {
+                insert: 'one'
+            },
+            {
+                attributes: {
+                    align: 'center',
+                },
+                insert: '\n\n'
+            },
+            {
+                insert: 'two'
+            },
+            {
+                attributes: {
+                    align: 'center',
+                },
+                insert: '\n'
+            }
+        ].forEach((op) => {
+            const errCode = provider.accept(op);
+            expect(errCode).toBe(0);
+        });
+        provider.setFinished();
+        const opsRes: Array<Op[]> = [];
+        while (!provider.isFinished()) {
+            const ops: Op[] = provider.consume();
+            if (ops.length === 0) {
+                continue;
+            }
+            opsRes.push(ops);
+        }
+        console.log(JSON.stringify(opsRes, null, 4));
+        expect(opsRes).toStrictEqual([
+            [
+                {
+                    "insert": "one",
+                    "attributes": {
+                        "start_align": "center"
+                    }
+                },
+            ],
+            [
+                {
+                    "insert": "\n\n",
+                    "attributes": {
+                        "align": "center"
+                    }
+                }
+            ],
+            [
+                {
+                    "insert": "two",
+                    "attributes": {
+                        "start_align": "center"
+                    }
+                }
+            ],
+            [
+                {
+                    "insert": "\n",
+                    "attributes": {
+                        "align": "center"
+                    }
+                }
+            ]
+        ]);
+    });
 });
